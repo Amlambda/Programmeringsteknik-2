@@ -1,0 +1,154 @@
+import java.util.Map;
+import java.util.TreeSet;
+
+/**
+ * A template for the parser class. Most of the methods are included
+ * but they do nothing but a call to the next metod.
+ * 
+ * How to use:
+ * 1. Copy the class to your own map
+ * 2. Rename the file and the class to Parser (don't forget the constructor!)
+ * 3. Create the exception classes SyntaxException and EvaluationException
+ * 4. Compile!
+ * 5. Run and see that the calcultar is just able to handle numbers.
+ * 6. Add addition handling in the method expression.
+ * 7. Add handling of subtractions also in the method expression
+ * 8. Add everything else...
+ * 
+ * @version 2016-08-11
+ */
+
+//I assignment: likhetstecknet följs inte av ett ord
+//• I primary:
+//1. Första fallet: högerparentesen efter assignment saknas
+//2. Andra fallet: vänsterparentes saknas efter function name
+//3. Inget av de fem fallen stämmer dvs inte vänsterparentes, inte funktionsnamn,
+//inte tal, inte minustecken och inte ord.
+
+public class Parser{
+	private Stokenizer tokenizer;
+	private Map<String, Double> variables; 
+	private TreeSet<String> functions;
+
+	public Parser(Stokenizer tokenizer, Map<String,Double> variables) {
+		this.tokenizer = tokenizer;
+		this.variables = variables;
+		functions = new TreeSet<String>();  
+		functions.add("sin");
+		functions.add("cos");
+		functions.add("exp");
+		functions.add("log");   
+	}
+
+	public double functionHandler(String functionName){
+		System.out.println(functionName);
+		tokenizer.nextToken();
+		double value = assignment();
+		double result = 0;
+		if (functionName == "sin"){
+			result = Math.sin(value);
+			System.out.println(result);
+		}else if (functionName == "cos"){
+
+		}else if (functionName == "exp"){
+
+		}else if (functionName == "log"){
+
+		}
+		return result;
+	}
+
+	public double assignment() {
+		double result = expression(); 
+		if(tokenizer.getChar()== '='){
+			tokenizer.nextToken();
+			if(tokenizer.isWord()){
+				variables.put(tokenizer.getWord(), result);
+				tokenizer.nextToken();
+			}
+			else{
+				throw new SyntaxException("\n" + "*** Syntax error. Expected variable after '" +
+						tokenizer.getPreviousToken() + "'" + "\n" +
+						"*** The error occured at token '" + tokenizer.getToken() +
+						"' just after token '" + tokenizer.getPreviousToken() + "'"); 
+			}
+		}
+		return result;  
+	}
+
+	public double expression() {//COMPLETE
+		double sum = term();
+		while (tokenizer.getChar()=='+'|| tokenizer.getChar()=='-'){			
+			if(tokenizer.getChar()=='+'){
+				tokenizer.nextToken();
+				sum += term();
+			}
+			else if(tokenizer.getChar()=='-'){
+				tokenizer.nextToken();
+				sum -= term();	
+			}
+		}
+		return sum;
+	}
+
+	public double term() {//COMPLETE
+		double prod = factor();
+		while ( tokenizer.getChar() == '*' || tokenizer.getChar()=='/') {
+			if(tokenizer.getChar()=='*'){
+				tokenizer.nextToken();
+				prod *= factor();
+			}
+			else if(tokenizer.getChar()=='/'){
+				tokenizer.nextToken();
+				prod /= factor();
+			}
+		}
+		return prod;
+	} 
+
+	public double factor() {// COMPLETE
+		if (tokenizer.getChar() == '(') {
+			tokenizer.nextToken();
+			double result = expression();
+			tokenizer.nextToken();
+			return result;
+		} 
+		else {
+			return primary();
+		}
+	}
+
+	public double primary() {
+		double result = 99999;
+		if (tokenizer.isNumber()) {
+			result = tokenizer.getNumber();
+			tokenizer.nextToken();
+
+		} else if(tokenizer.isWord() && functions.contains(tokenizer.getWord())){
+			String fName = tokenizer.getWord();
+			if(tokenizer.nextToken() == '('){
+				result = functionHandler(fName);
+				tokenizer.nextToken();}
+			else{
+				throw new SyntaxException("\n" + "*** Syntax error. Expected '('" + "\n" +
+						"*** The error occured at token '" + tokenizer.getToken() +
+						"' just after token '" + tokenizer.getPreviousToken() + "'");
+			}
+		} else if(tokenizer.getChar() == '-'){//FEEEEEEEEL
+			tokenizer.nextToken();
+			result = -primary();
+			tokenizer.nextToken();
+
+		} else if(tokenizer.isWord()){
+			result = variables.get(tokenizer.getWord());
+			tokenizer.nextToken();
+
+		}else{ 
+			throw new SyntaxException("\n" + "*** Syntax error. Expected number, word or '('" + "\n" +
+					"*** The error occured at token '" + tokenizer.getToken() +
+					"' just after token '" + tokenizer.getPreviousToken() + "'");
+			//throw new SyntaxException("primary not complete yet: "+ tokenizer.getToken());
+		}
+		return result;
+	}
+} 

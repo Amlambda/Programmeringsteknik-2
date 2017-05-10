@@ -1,0 +1,8 @@
+import javax.swing.JPanel;
+
+public class Box extends JPanel{
+	
+public Box(int length,int width){
+	
+}
+}

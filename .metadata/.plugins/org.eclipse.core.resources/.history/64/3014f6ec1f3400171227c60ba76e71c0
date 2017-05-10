@@ -1,0 +1,49 @@
+import java.awt.Color;
+
+public class Ball {
+//private Color color = blue;
+private Vector position;
+private Vector velocity;
+private double size; //Radius of ball
+private double stepLength = 0.01;
+
+public Ball(Vector pos, Vector speed, double size){
+	this.position = pos;
+	this.velocity = speed;
+	this.size = size;
+}
+
+public Vector getPos(){
+	return this.position;
+}
+
+public Vector getVel(){
+	return this.velocity;
+}
+
+public double getSize(){
+	return this.size;
+}
+
+public void setPos(Vector v){
+	this.position = v;
+}
+
+public void setVel(Vector v){
+	this.velocity = v;
+}
+
+public void setSize(double d){
+	this.size = d;
+}
+
+public void move(double delay){
+	this.position = this.position.add(this.velocity.scale(delay));
+}
+ 
+//collide
+public void collide(Ball b){
+	
+}
+
+}

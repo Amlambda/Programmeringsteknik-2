@@ -1,0 +1,5 @@
+import javax.swing.JFrame;
+
+public class Ball_GUI extends JFrame {
+
+}

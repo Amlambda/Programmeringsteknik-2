@@ -1,0 +1,68 @@
+import java.awt.Color;
+import java.awt.Graphics;
+
+public class Ball {
+//private Color color = blue;
+private Vector position;
+private Vector velocity;
+private double size; //Radius of ball
+private Color c;
+private Box box;
+
+public Ball(Box box, Vector pos, Vector speed, double size){
+	this.position = pos;
+	this.velocity = speed;
+	this.size = size;
+	this.box = box;
+    c = new Color((float)Math.random(),
+            (float)Math.random(),
+            (float)Math.random()); // Random color
+}
+
+public Vector getPos(){
+	return this.position;
+}
+
+public Vector getVel(){
+	return this.velocity;
+}
+
+public double getSize(){
+	return this.size;
+}
+
+public void setPos(Vector v){
+	this.position = v;
+}
+
+public void setVel(Vector v){
+	this.velocity = v;
+}
+
+public void setSize(double d){
+	this.size = d;
+}
+
+public void move(double delay){
+	this.position = this.position.add(this.velocity.scale(delay));
+}
+ 
+//collide
+public void collide(Ball b){
+	Vector velDiff1 = b.getVel().sub(this.velocity);
+	Vector velDiff2 = this.velocity.sub(b.getVel());
+	Vector posDiff = b.getPos().sub(this.position);
+	Vector exp1 = posDiff.scale((velDiff1.dot(posDiff))/Math.pow(posDiff.length(),2));
+	Vector exp2 = posDiff.scale((velDiff2.dot(posDiff))/Math.pow(posDiff.length(),2));
+	
+	this.velocity = this.velocity.add(exp1); 
+	b.setVel(b.getVel().add(exp2));						
+}
+
+public void paint(Graphics g) {
+    g.setColor(c);
+   // g.fillOval(this.position.getX()-size, this.position.getY()-size, 2*size, 2*size);
+ }
+}
+
+
